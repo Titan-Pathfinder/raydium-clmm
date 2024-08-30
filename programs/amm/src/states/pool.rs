@@ -476,7 +476,7 @@ impl PoolState {
         let (is_initialized, start_index) =
             if self.is_overflow_default_tickarray_bitmap(vec![self.tick_current]) {
                 tickarray_bitmap_extension
-                    .unwrap()
+                    .ok_or(ErrorCode::MissingTickArrayBitmapExtensionAccount)?
                     .check_tick_array_is_initialized(
                         TickArrayState::get_array_start_index(self.tick_current, self.tick_spacing),
                         self.tick_spacing,
