@@ -225,7 +225,7 @@ pub fn get_delta_amount_1_unsigned(
         std::mem::swap(&mut sqrt_ratio_a_x64, &mut sqrt_ratio_b_x64);
     };
 
-    let val = if round_up {
+    let val_opt = if round_up {
         U256::from(liquidity).mul_div_ceil(
             U256::from(sqrt_ratio_b_x64 - sqrt_ratio_a_x64),
             U256::from(fixed_point_64::Q64),
@@ -235,13 +235,17 @@ pub fn get_delta_amount_1_unsigned(
             U256::from(sqrt_ratio_b_x64 - sqrt_ratio_a_x64),
             U256::from(fixed_point_64::Q64),
         )
-    }
-    .unwrap();
+    };
+
+    let val = match val_opt {
+        Some(x) => x,
+        _ => return err!(ErrorCode::U256toU64Overflow)
+    };
 
     if fits_word(&val) {
         return Ok(val.as_u64());
     } else {
-        return err!(ErrorCode::U256toU64Overflow);
+        return err!(ErrorCode::U256MathError);
     }
 }
 
