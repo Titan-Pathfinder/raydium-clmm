@@ -37,6 +37,12 @@ pub enum ErrorCode {
     #[msg("sqrt_price_x64 out of range")]
     SqrtPriceX64,
 
+    #[msg("Overflow when converting U256 to U64")]
+    U256toU64Overflow,
+
+    #[msg("Failed U256 math operations")]
+    U256MathError,
+
     // Liquidity Sub
     #[msg("Liquidity sub delta L must be smaller than before")]
     LiquiditySubValueErr,
