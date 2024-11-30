@@ -17,10 +17,14 @@ use anchor_lang::prelude::*;
 pub fn add_delta(x: u128, y: i128) -> Result<u128> {
     let z: u128;
     if y < 0 {
-        z = x - u128::try_from(-y).unwrap();
+        z = x
+            .checked_sub(u128::try_from(-y).unwrap())
+            .ok_or(ErrorCode::U128MathOverflow)?;
         require_gt!(x, z, ErrorCode::LiquiditySubValueErr);
     } else {
-        z = x + u128::try_from(y).unwrap();
+        z = x
+            .checked_add(u128::try_from(y).unwrap())
+            .ok_or(ErrorCode::U128MathOverflow)?;
         require_gte!(z, x, ErrorCode::LiquidityAddValueErr);
     }
 
@@ -239,7 +243,7 @@ pub fn get_delta_amount_1_unsigned(
 
     let val = match val_opt {
         Some(x) => x,
-        _ => return err!(ErrorCode::U256toU64Overflow)
+        _ => return err!(ErrorCode::U256toU64Overflow),
     };
 
     if fits_word(&val) {
