@@ -184,17 +184,15 @@ pub fn get_delta_amount_0_unsigned(
     assert!(sqrt_ratio_a_x64 > 0);
 
     let val = if round_up {
-        U256::div_rounding_up(
-            numerator_1
-                .mul_div_ceil(numerator_2, U256::from(sqrt_ratio_b_x64))
-                .unwrap(),
-            U256::from(sqrt_ratio_a_x64),
-        )
+        match numerator_1.mul_div_ceil(numerator_2, U256::from(sqrt_ratio_b_x64)) {
+            Some(x) => U256::div_rounding_up(x, U256::from(sqrt_ratio_a_x64)),
+            _ => return err!(ErrorCode::U256MathError),
+        }
     } else {
-        (numerator_1
-            .mul_div_floor(numerator_2, U256::from(sqrt_ratio_b_x64))
-            .unwrap()
-            / U256::from(sqrt_ratio_a_x64))
+        match numerator_1.mul_div_floor(numerator_2, U256::from(sqrt_ratio_b_x64)) {
+            Some(x) => x / U256::from(sqrt_ratio_a_x64),
+            _ => return err!(ErrorCode::U256MathError),
+        }
     };
 
     if fits_word(&val) {
